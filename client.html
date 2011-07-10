@@ -1,3 +1,6 @@
+<html>
+    <head>
+    <link href="/stylesheets/main.css" media="screen" rel="stylesheet" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js""></script>
 <script src="/d3/d3.js"></script>
 <script src="/socket.io/socket.io.js"></script>
@@ -11,6 +14,88 @@
     });
 </script>
 
+<script>
+    $(document).ready(function() {
+        drawGraph();
+        setInterval(function() {
+            data.shift();
+            data.push(next());
+            redraw();
+        }, 1500);
+    });
+
+    var t = 1297110663,
+        v = 70,
+        data = d3.range(60).map(next);
+
+        var w = 10,
+        h = 180;
+
+        var x = d3.scale.linear().domain([0,1]).range([0,w]);
+        var y = d3.scale.linear().domain([0,100]).rangeRound([0,h]);
+
+        var chart;
+
+    function next() {
+        return {
+            time: ++t,
+            value: ~~Math.max(10, Math.min(90, v + 10 * (Math.random() - .5)))
+        };
+    }
+
+
+    function drawGraph() {
+
+        chart = d3.select('#graph')
+        .append("svg:svg")
+        .attr("class", "chart")
+        .attr("width", w * data.length - 1)
+        .attr("height", h);
+
+        chart.selectAll("rect")
+        .data(data)
+        .enter().append("svg:rect")
+        .attr("x", function(d, i) { return x(i) - 0.5; })
+        .attr("y", function(d) { return h - y(d.value) - 0.5; })
+        .attr("width", w)
+        .attr("height", function(d) { return y(d.value); });
+    };
+
+    function redraw() {
+        var rect = chart.selectAll("rect")
+        .data(data, function(d) { return d.time;});
+
+        rect.enter().insert("svg:rect", "line")
+        .attr("x", function(d, i) { return x(i + 1) - 0.5; })
+        .attr("y", function(d) { return h - y(d.value) - 0.5; })
+        .attr("width", w)
+        .attr("height", function(d) { return y(d.value); })
+        .transition()
+        .duration(1000)
+        .attr("x", function(d, i) { return x(i) - 0.5 });
+
+        rect.transition()
+        .duration(1000)
+        .attr("x", function(d, i) { return x(i) - 0.5; });
+
+        rect.exit()
+        .transition()
+        .duration(1000)
+        .attr("x", function(d, i) { return x(i - 1) - 0.5 })
+        .remove();
+
+
+    };
+
+
+</script>
+</head>
+<body>
 <h1>client</h1>
 <div class="messages">
 </div>
+
+<div id="graph">
+</div>
+
+</body>
