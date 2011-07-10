@@ -10,7 +10,6 @@ div.messages {
 }
 
 div#graph {
-    border: 1px solid blue;
     width:650px;
     height:500px;
     float:left;

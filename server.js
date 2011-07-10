@@ -45,22 +45,39 @@ var httpServer = http.createServer(function(request, response) {
 httpServer.listen('8888');
 
 var io = io.listen(httpServer);
+var redis = require('redis');
+var redisClient = redis.createClient();
 
 io.sockets.on('connection', function(socket) {
     console.log("client connected");
-    // setInterval(function() {
-    // socket.emit('buzzard', "hello world");
-    // }, 1000);
-    var redis = require('redis');
-    var client = redis.createClient();
-    client.on("subscribe", function(channel, count) {
-        socket.emit('redis_pub_sub', "subscribed to " + channel);
-    });
-
-    client.on("message", function(channel, message) {
-        socket.emit('redis_pub_sub', {'channel':channel, 'message':message});
-    });
-
-    client.subscribe("mt_sent");
+    setInterval(function() {
+        sendValue(socket);
+    }, 1000);
 });
 
+function sendValue(socket) {
+    now = timestamp() - 5;
+    redisClient.get("mt_sent:" + now, function(err, res) {
+        message = {
+            time:now,
+            value:res
+        };
+        socket.emit('data_update', {'channel':'mt_sent', 'message':message});
+    });
+}
+
+function get_initial_data() {
+    now = timestamp();
+    return_data = [];
+    for(t=(now - 60);t < now;t++) {
+        return_data.push({
+            time: t,
+            value:12
+        });
+    }
+    return return_data;
+}
+
+function timestamp() {
+    return Math.round(new Date().getTime() / 1000);
+}
