@@ -15,6 +15,8 @@
             data.shift();
             data.push(redis_data['message']);
             redraw();
+            rps = Math.round(((data.map(function(d) { return d.value;}).reduce(function(x, a) { return x + a}, 0))/60) * 100)/100
+            $('#rps').text(rps);
         });
     }
 
@@ -59,6 +61,7 @@
         .attr("y1", h - .5)
         .attr("y2", h - .5)
         .attr("stroke", "#000");
+
     };
 
     function redraw() {
@@ -76,22 +79,44 @@
 
         rect.transition()
             .duration(1000)
-            .attr("x", function(d, i) { return x(i) - 0.5; })
+            .attr("x", function(d, i) { return x(i) - 0.5; });
 
         rect.exit()
             /* .transition() */
             /* .duration(1000) */
             /* .attr("x", function(d, i) { return x(i-1) - 0.5;}) */
             .remove();
+
+        /* var labels = chart.selectAll("text") */
+        /*     .data(data, function(d) { return d.time; }); */
+        /* labels.enter().insert("svg:text") */
+        /*     .attr("x", function(d, i) { return x(i + 1) - 0.5; }) */
+        /*     .attr("y", function(d) { return h - y(d.value) - 0.5; }) */
+        /*     .attr("dx", w) // padding-right */
+        /*     .attr("dy", ".35em") // vertical-align: middle */
+        /*     .attr("text-anchor", "end") // text-align: right */
+        /*     .text(String) */
+        /* .transition() */
+        /*     .duration(1000) */
+        /*     .attr("x", function(d, i) { return x(i) - 0.5; }); */
+        /* labels.transition() */
+        /*     .duration(1000) */
+        /*     .attr("x", function(d, i) { return x(i) - 0.5; }); */
+        /* labels.exit().remove(); */
+
     };
 
 
 </script>
 </head>
 <body>
-<h1>graphs</h1>
+    <h1>graph test</h1>
 
-<div id="graph">
-</div>
 
+    <div>
+        Requests per second: <span id="rps"></span>
+    </div>
+    <div id="graph">
+    </div>
 </body>
+</html>

@@ -50,32 +50,28 @@ var redisClient = redis.createClient();
 
 io.sockets.on('connection', function(socket) {
     console.log("client connected");
+    init_data(socket);
     setInterval(function() {
-        sendValue(socket);
+        now = timestamp() - 5;
+        sendValue(socket, now);
     }, 1000);
 });
 
-function sendValue(socket) {
-    now = timestamp() - 5;
+function sendValue(socket, now) {
     redisClient.get("mt_sent:" + now, function(err, res) {
         message = {
             time:now,
-            value:res
+            value:parseInt(res)
         };
         socket.emit('data_update', {'channel':'mt_sent', 'message':message});
     });
 }
 
-function get_initial_data() {
+function init_data(socket) {
     now = timestamp();
-    return_data = [];
     for(t=(now - 60);t < now;t++) {
-        return_data.push({
-            time: t,
-            value:12
-        });
+        sendValue(socket, t);
     }
-    return return_data;
 }
 
 function timestamp() {

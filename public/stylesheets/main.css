@@ -1,5 +1,11 @@
 body {
+    font-family:"Helvetica";
     background-color: #eee;
+}
+
+div {
+    float: left;
+    clear:both;
 }
 
 div.messages {
@@ -20,4 +26,8 @@ div#graph {
     fill: steelblue;
     stroke: white;
     margin: 20px;
+}
+
+text {
+    color: black;
 }
