@@ -28,6 +28,16 @@ div#graph {
     margin: 20px;
 }
 
+/* line { */
+/*     stroke: #bbb; */
+/* } */
+/*  */
+path {
+    stroke: steelblue;
+    stroke-width: 3px;
+    fill:none;
+}
+
 text {
     color: black;
 }

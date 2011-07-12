@@ -11,6 +11,9 @@
     var data;
 
     function connectSocket() {
+        socket.on('connect', function(f) {
+            console.log("connected");
+        });
         socket.on('data_update', function(redis_data) {
             data.shift();
             data.push(redis_data['message']);
