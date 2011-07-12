@@ -1,5 +1,4 @@
 $(document).ready(() ->
-    console.log("here")
     drawGraph()
 )
 
@@ -11,13 +10,13 @@ max = d3.max(data)
 x = d3.scale.linear().domain([0, data.length - 1]).range([0, w])
 y = d3.scale.linear().domain([0, max]).range([h, 0])
 
-vis = d3.select("#chart")
-    .append("svg:svg")
-    .attr("width", w)
-    .attr("height", h)
 
 drawGraph = () ->
-    console.log("drawing #{vis")
+    vis = d3.select("#chart")
+        .append("svg:svg")
+        .attr("width", w)
+        .attr("height", h)
+
     vis.selectAll("path.line")
         .data([data])
         .enter()
