@@ -22,16 +22,20 @@ div#graph {
     margin-left: 20px;
 }
 
+div#chart {
+    border: 1px solid red;
+}
+
 .chart {
     fill: steelblue;
     stroke: white;
     margin: 20px;
 }
 
-/* line { */
-/*     stroke: #bbb; */
-/* } */
-/*  */
+line {
+    stroke: #bbb;
+}
+
 path {
     stroke: steelblue;
     stroke-width: 3px;
@@ -40,4 +44,8 @@ path {
 
 text {
     color: black;
+}
+
+.tick {
+    color: red;
 }
