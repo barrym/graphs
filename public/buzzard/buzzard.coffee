@@ -2,30 +2,39 @@ $(document).ready(() ->
     drawGraph()
 )
 
-data = [3,7,9,1,4,6,38,8,2,5,45]
-more_data = [21,45,21,21,34,32,12] # work out how to css this differently
+data = [3,7,9,1,4,6,38,8,2,5,45,44,42,42,40,44,45,30]
+more_data = [21,45,21,21,34,32,12]
 w = 700
 h = 300
 p = 30
-max = d3.max(data)
+max = d3.max(data) # TODO: max of both arrays
 
 x = d3.scale.linear().domain([0, data.length - 1]).range([0 + p, w - p])
 y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
+# setInterval(
+#     () ->
+#         data.shift()
+#         data.push(Math.round(Math.random() * 50))
+#         drawGraph()
+#     , 1500)
+
+vis = d3.select("#chart")
+    .append("svg:svg")
+    .attr("width", w)
+    .attr("height", h)
 
 drawGraph = () ->
-    vis = d3.select("#chart")
-        .append("svg:svg")
-        .attr("width", w)
-        .attr("height", h)
+    console.log("drawing")
 
     vis.selectAll("path.line")
-        .data([data])
+        .data([data, more_data])
         .enter()
         .append("svg:path")
         .attr("d", d3.svg.line()
             .x((d, i) -> x(i))
-            .y(y))
+            .y((d) -> y(d)) )
+        .attr("class", (d, i) -> ( if i == 0 then "o2" else "vodafone"))
 
     yticks = vis.selectAll(".ticks")
         .data(y.ticks(7))
