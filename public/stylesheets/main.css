@@ -23,7 +23,12 @@ div#graph {
 }
 
 div#chart {
-    border: 1px solid red;
+    width: 800px;
+    height: 500px; /* doesn't matter */
+}
+
+svg {
+    border: 1px solid black;
 }
 
 .chart {
@@ -38,7 +43,7 @@ line {
 
 path {
     stroke: steelblue;
-    stroke-width: 3px;
+    stroke-width: 1px;
     fill:none;
 }
 
@@ -48,4 +53,12 @@ text {
 
 .tick {
     color: red;
+}
+
+.o2 {
+    stroke: blue;
+}
+
+.vodafone {
+    stroke: red;
 }
