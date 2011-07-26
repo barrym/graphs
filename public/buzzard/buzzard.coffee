@@ -1,5 +1,6 @@
 $(document).ready(() ->
     $('#modifier_text_input').val(modifier)
+    $('#xtickcount_text_input').val(xTickCount)
     $('#ytickcount_text_input').val(yTickCount)
     drawGraph()
 )
@@ -39,6 +40,11 @@ $('#modifier_text_input').change((e) ->
     modifier = parseInt($('#modifier_text_input').val())
 )
 
+$('#xtickcount_text_input').change((e) ->
+    xTickCount = parseInt($('#xtickcount_text_input').val())
+)
+
+
 $('#ytickcount_text_input').change((e) ->
     yTickCount = parseInt($('#ytickcount_text_input').val())
 )
@@ -71,7 +77,7 @@ vis = d3.select("#chart")
 path = d3.svg.line()
     .x((d, i) -> x(d['time']))
     .y((d) -> y(d['value']))
-    .interpolate("cardinal")
+    .interpolate("linear")
 
 drawGraph = () ->
     xrule = vis.selectAll("g.x")
@@ -124,14 +130,17 @@ drawGraph = () ->
 redraw = () ->
     durationTime = interval/2
 
+    xrule = vis.selectAll("g.x")
+        .data(x.ticks(xTickCount))
+
     yrule = vis.selectAll("g.y")
         .data(y.ticks(yTickCount))
 
     # NEW
-    newrule = yrule.enter().append("svg:g")
+    newyrule = yrule.enter().append("svg:g")
         .attr("class", "y")
 
-    newrule.append("svg:line")
+    newyrule.append("svg:line")
         .attr("x1", 0)
         .attr("y1", 0)
         .attr("x2", w)
@@ -141,13 +150,38 @@ redraw = () ->
         .attr("y1", y)
         .attr("y2", y)
 
-    newrule.append("svg:text")
+    newyrule.append("svg:text")
         .attr("text-anchor", "start")
         .attr("y", 0)
         .transition()
         .duration(durationTime)
         .attr("y", y)
         .text(y.tickFormat(yTickCount))
+
+    newxrule = xrule.enter().append("svg:g")
+        .attr("class", "x")
+
+    newxrule.append("svg:line")
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", w)
+        .attr("y2", h)
+        .transition()
+        .duration(durationTime)
+        .attr("x1", x)
+        .attr("x2", x)
+
+    newxrule.append("svg:text")
+        .attr("text-anchor", "middle")
+        .attr("x", w)
+        .attr("y", h)
+        .style("opacity", 0)
+        .transition()
+        .duration(durationTime)
+        .style("opacity", 1)
+        .attr("x", x)
+        .attr("text-anchor", "middle")
+        .text(x.tickFormat(xTickCount))
 
     # UPDATES
     yrule.select("text")
@@ -156,6 +190,18 @@ redraw = () ->
         .attr("y", y)
         .text(y.tickFormat(yTickCount))
 
+    xrule.select("text")
+        .transition()
+        .duration(durationTime)
+        .attr("x", x)
+        .text(x.tickFormat(xTickCount))
+
+    xrule.select("line")
+        .transition()
+        .duration(durationTime)
+        .attr("x1", x)
+        .attr("x2", x)
+
     yrule.select("line")
         .transition()
         .duration(durationTime)
@@ -163,9 +209,28 @@ redraw = () ->
         .attr("y2", y)
 
     # OLD
-    oldrule = yrule.exit()
+    oldxrule = xrule.exit()
 
-    oldrule.select("line")
+    oldxrule.select("line")
+            .transition()
+            .duration(durationTime)
+            .attr("x1", 0)
+            .attr("x2", 0)
+            .style("opacity", 0)
+            .remove()
+
+    oldxrule.select("text")
+            .transition()
+            .duration(durationTime)
+            .attr("x", 0)
+            .style("opacity", 0)
+            .remove()
+
+    oldxrule.transition().duration(durationTime).remove()
+
+    oldyrule = yrule.exit()
+
+    oldyrule.select("line")
             .transition()
             .duration(durationTime)
             .attr("y1", 0)
@@ -173,17 +238,17 @@ redraw = () ->
             .style("opacity", 0)
             .remove()
 
-    oldrule.select("text")
+    oldyrule.select("text")
             .transition()
             .duration(durationTime)
             .attr("y", 0)
             .style("opacity", 0)
             .remove()
 
-    oldrule.transition().duration(durationTime).remove()
+    oldyrule.transition().duration(durationTime).remove()
 
     vis.selectAll("path")
         .data([uk_o2, uk_vodafone])
         .transition()
-        .duration(durationTime)
+        .duration(0)
         .attr("d", path)
