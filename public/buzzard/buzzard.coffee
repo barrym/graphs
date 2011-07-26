@@ -4,10 +4,12 @@ $(document).ready(() ->
     drawGraph()
 )
 
+next =  () ->
+    Math.round(Math.random() * modifier)
 
 modifier = 50
-data      = d3.range(10).map(() -> Math.round(Math.random() * modifier))
-more_data = d3.range(10).map(() -> Math.round(Math.random() * modifier))
+data      = d3.range(10).map(next)
+more_data = d3.range(10).map(next)
 
 w = 700
 h = 300
@@ -31,13 +33,14 @@ $('#ytickcount_text_input').change((e) ->
 setInterval(
     () ->
         data.shift()
-        data.push(Math.round(Math.random() * modifier))
+        data.push(next())
         more_data.shift()
-        more_data.push(Math.round(Math.random() * modifier))
+        more_data.push(next())
         x = d3.scale.linear().domain([0, data.length - 1]).range([0 + p, w - p])
         y = d3.scale.linear().domain([0, d3.max(data.concat(more_data))]).range([h - p, 0 + p])
         redraw()
     , interval)
+
 
 vis = d3.select("#chart")
     .append("svg:svg")
@@ -97,7 +100,7 @@ drawGraph = () ->
         .enter()
         .append("svg:path")
         .attr("d", path)
-        .attr("class", (d, i) -> ( if i == 0 then "o2" else "vodafone"))
+        .attr("class", (d, i) -> ( if i == 0 then "uk_o2" else "uk_vodafone"))
 
 
 redraw = () ->
