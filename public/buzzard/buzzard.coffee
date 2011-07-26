@@ -8,16 +8,16 @@ next =  () ->
     Math.round(Math.random() * modifier)
 
 modifier = 50
-data      = d3.range(10).map(next)
-more_data = d3.range(10).map(next)
+uk_o2       = d3.range(10).map(next)
+uk_vodafone = d3.range(10).map(next)
 
 w = 700
 h = 300
 p = 30
 interval = 1000
-max = d3.max(data.concat(more_data))
+max = d3.max(uk_o2.concat(uk_vodafone))
 
-x = d3.scale.linear().domain([0, data.length - 1]).range([0 + p, w - p])
+x = d3.scale.linear().domain([0, uk_o2.length - 1]).range([0 + p, w - p])
 y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 xTickCount = 10
 yTickCount = 10
@@ -32,12 +32,12 @@ $('#ytickcount_text_input').change((e) ->
 
 setInterval(
     () ->
-        data.shift()
-        data.push(next())
-        more_data.shift()
-        more_data.push(next())
-        x = d3.scale.linear().domain([0, data.length - 1]).range([0 + p, w - p])
-        y = d3.scale.linear().domain([0, d3.max(data.concat(more_data))]).range([h - p, 0 + p])
+        uk_o2.shift()
+        uk_o2.push(next())
+        uk_vodafone.shift()
+        uk_vodafone.push(next())
+        x = d3.scale.linear().domain([0, uk_o2.length - 1]).range([0 + p, w - p])
+        y = d3.scale.linear().domain([0, d3.max(uk_o2.concat(uk_vodafone))]).range([h - p, 0 + p])
         redraw()
     , interval)
 
@@ -96,7 +96,7 @@ drawGraph = () ->
         .attr("y", y)
 
     vis.selectAll("path.line")
-        .data([data, more_data])
+        .data([uk_o2, uk_vodafone])
         .enter()
         .append("svg:path")
         .attr("d", path)
@@ -165,7 +165,7 @@ redraw = () ->
     oldrule.transition().duration(durationTime).remove()
 
     vis.selectAll("path")
-        .data([data, more_data])
+        .data([uk_o2, uk_vodafone])
         .transition()
         .duration(durationTime)
         .attr("d", path)
