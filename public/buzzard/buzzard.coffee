@@ -4,8 +4,13 @@ $(document).ready(() ->
     drawGraph()
 )
 
-next =  () ->
-    Math.round(Math.random() * modifier)
+foo = 0
+next = (x) ->
+    foo = x
+    {
+        time: x * 3,
+        value: Math.round(Math.random() * modifier)
+    }
 
 modifier = 50
 xpoints = 10
@@ -17,10 +22,16 @@ w = 700
 h = 300
 p = 30
 interval = 1000
-max = d3.max(uk_o2.concat(uk_vodafone))
 
-x = d3.scale.linear().domain([0, uk_o2.length - 1]).range([0 + p, w - p])
+
+uk_o2_values = uk_o2.map((d) -> d['value'])
+uk_o2_times = uk_o2.map((d) -> d['time'])
+uk_vodafone_values = uk_vodafone.map((d) -> d['value'])
+max = d3.max(uk_o2_values.concat(uk_vodafone_values))
+
+x = d3.scale.linear().domain([d3.min(uk_o2_times), d3.max(uk_o2_times)]).range([0 + p, w - p])
 y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
+
 xTickCount = 10
 yTickCount = 10
 
@@ -34,12 +45,17 @@ $('#ytickcount_text_input').change((e) ->
 
 setInterval(
     () ->
+        foo++
         uk_o2.shift()
-        uk_o2.push(next())
+        uk_o2.push(next(foo))
         uk_vodafone.shift()
-        uk_vodafone.push(next())
-        x = d3.scale.linear().domain([0, uk_o2.length - 1]).range([0 + p, w - p])
-        y = d3.scale.linear().domain([0, d3.max(uk_o2.concat(uk_vodafone))]).range([h - p, 0 + p])
+        uk_vodafone.push(next(foo))
+        uk_o2_values = uk_o2.map((d) -> d['value'])
+        uk_o2_times = uk_o2.map((d) -> d['time'])
+        uk_vodafone_values = uk_vodafone.map((d) -> d['value'])
+        max = d3.max(uk_o2_values.concat(uk_vodafone_values))
+        x = d3.scale.linear().domain([d3.min(uk_o2_times), d3.max(uk_o2_times)]).range([0 + p, w - p])
+        y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
         redraw()
     , interval)
 
@@ -53,8 +69,8 @@ vis = d3.select("#chart")
 
 
 path = d3.svg.line()
-    .x((d, i) -> x(i))
-    .y((d) -> y(d))
+    .x((d, i) -> x(d['time']))
+    .y((d) -> y(d['value']))
     .interpolate("cardinal")
 
 drawGraph = () ->
