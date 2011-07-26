@@ -8,8 +8,10 @@ next =  () ->
     Math.round(Math.random() * modifier)
 
 modifier = 50
-uk_o2       = d3.range(10).map(next)
-uk_vodafone = d3.range(10).map(next)
+xpoints = 10
+
+uk_o2       = d3.range(xpoints).map(next)
+uk_vodafone = d3.range(xpoints).map(next)
 
 w = 700
 h = 300
@@ -53,7 +55,7 @@ vis = d3.select("#chart")
 path = d3.svg.line()
     .x((d, i) -> x(i))
     .y((d) -> y(d))
-    .interpolate("bundle")
+    .interpolate("cardinal")
 
 drawGraph = () ->
     xrule = vis.selectAll("g.x")
