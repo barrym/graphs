@@ -1,7 +1,7 @@
 w = 700
 h = 300
 p = 40
-interval = 1000
+interval = 500
 
 data = []
 ranks = []
@@ -92,7 +92,7 @@ redraw = () ->
         .ease("linear")
         .attr("x", (d) -> x(d.votes))
         .attr("y", (d) -> y(ranks[d.name].rank))
-        .text((d) -> d.votes)
+        .text((d) -> d3.format(",")(d.votes))
 
     vis.selectAll("text.candidates")
         .data(data)
