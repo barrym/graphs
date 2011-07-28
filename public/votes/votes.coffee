@@ -1,10 +1,11 @@
 w = 700
 h = 300
 p = 40
-interval = 500
+interval = 100
 
 data = []
 ranks = []
+totalVotes = 0
 data.push({name:"Barry", votes:0, color:"#99CC33", rank:0})
 data.push({name:"David", votes:0, color:"#663399", rank:1})
 data.push({name:"Luca",  votes:0, color:"#993366", rank:2})
@@ -21,7 +22,6 @@ setInterval(
         rankeddata = data.slice(0)
         rankeddata.sort((candidate1, candidate2) -> candidate2.votes - candidate1.votes)
         # console.log(rankeddata.map((d) ->d.name + d.votes))
-        $('#leader').html(rankeddata[0].name)
         i = 0
         while i < rankeddata.length
             ranks[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes, color:rankeddata[i].color}
@@ -31,6 +31,9 @@ setInterval(
         redraw()
         data = rankeddata.slice(0)
         # console.log(data.map((d) -> d.votes))
+        totalVotes = d3.sum(data.map((d) -> d.votes))
+        $('#leader').html(rankeddata[0].name)
+        $('#votes').html(d3.format(",")(totalVotes))
     , interval)
 
 vis = d3.select("#chart")

@@ -24,8 +24,16 @@ div#graph {
 
 div#chart {
     width: 800px;
-    height: 500px; /* doesn't matter */
+    /* height: 500px; /* doesn't matter */ */
     /* border: 1px solid red; */
+}
+
+#leader {
+    color: #00aa00;
+}
+
+#votes {
+    color: #00aa00;
 }
 
 #chart rect {
@@ -59,10 +67,10 @@ text.candidates {
 }
 
 text.votes {
-    fill: white;
-    /* stroke: black; */
+    fill: black;
+    stroke: black;
     font-size:30px;
-    /* stroke-width:2px; */
+    stroke-width:1px;
 }
 
 .chart {
