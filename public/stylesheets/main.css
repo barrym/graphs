@@ -47,6 +47,24 @@ svg {
     border: 1px solid #ccc;
 }
 
+text {
+    font-family: Helvetica;
+}
+
+text.candidates {
+    fill: black;
+    /* stroke: black; */
+    font-size:30px;
+    /* stroke-width:2px; */
+}
+
+text.votes {
+    fill: white;
+    /* stroke: black; */
+    font-size:30px;
+    /* stroke-width:2px; */
+}
+
 .chart {
     fill: steelblue;
     stroke: white;
