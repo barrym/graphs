@@ -25,6 +25,17 @@ div#graph {
 div#chart {
     width: 800px;
     height: 500px; /* doesn't matter */
+    /* border: 1px solid red; */
+}
+
+#chart rect {
+    stroke: black;
+    fill: steelblue;
+}
+
+.large {
+    font-weight:bold;
+    font-size:8em;
 }
 
 label {
@@ -33,7 +44,7 @@ label {
 }
 
 svg {
-    border: 1px solid black;
+    border: 1px solid #ccc;
 }
 
 .chart {
