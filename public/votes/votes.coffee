@@ -5,11 +5,11 @@ interval = 1000
 
 data = []
 ranks = []
-data.push({name:"Barry", votes:0, color:"#ff0000", rank:0})
-data.push({name:"David", votes:0, color:"#00ff00", rank:1})
-data.push({name:"Luca",  votes:0, color:"#0000ff", rank:2})
-data.push({name:"Toons", votes:0, color:"#33c9fb", rank:3})
-data.push({name:"Misha", votes:0, color:"#c33e8b", rank:4})
+data.push({name:"Barry", votes:0, color:"#99CC33", rank:0})
+data.push({name:"David", votes:0, color:"#663399", rank:1})
+data.push({name:"Luca",  votes:0, color:"#993366", rank:2})
+data.push({name:"Toons", votes:0, color:"#CCFF33", rank:3})
+data.push({name:"Misha", votes:0, color:"#999900", rank:4})
 
 maxvotes = d3.max(data.map((d) -> d.votes))
 x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
@@ -20,14 +20,17 @@ setInterval(
         data.map((d) -> d.votes += Math.round(Math.random() * Math.random() * 1000))
         rankeddata = data.slice(0)
         rankeddata.sort((candidate1, candidate2) -> candidate2.votes - candidate1.votes)
+        # console.log(rankeddata.map((d) ->d.name + d.votes))
+        $('#leader').html(rankeddata[0].name)
         i = 0
         while i < rankeddata.length
-            ranks[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes}
+            ranks[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes, color:rankeddata[i].color}
             i++
         maxvotes = d3.max(data.map((d) -> d.votes))
         x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
         redraw()
-        data = rankeddata
+        data = rankeddata.slice(0)
+        # console.log(data.map((d) -> d.votes))
     , interval)
 
 vis = d3.select("#chart")
@@ -80,17 +83,21 @@ redraw = () ->
         .ease("linear")
         .attr("width", (d) -> x(d.votes))
         .attr("y", (d) -> y(ranks[d.name].rank))
+        .style("fill", (d) -> ranks[d.name].color)
 
     vis.selectAll("text.votes")
         .data(data)
         .transition()
         .duration(durationTime)
+        .ease("linear")
         .attr("x", (d) -> x(d.votes))
         .attr("y", (d) -> y(ranks[d.name].rank))
-        .text((d) -> ranks[d.name].votes)
+        .text((d) -> d.votes)
 
     vis.selectAll("text.candidates")
         .data(data)
         .transition()
         .duration(durationTime)
+        .ease("linear")
         .attr("y", (d) -> y(ranks[d.name].rank))
+        .text((d) -> d.name)
