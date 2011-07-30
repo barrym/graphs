@@ -8,11 +8,11 @@ newpositions = []
 totalVotes = 0
 
 data = []
-data.push({name:"Barry", votes:0, color:"#99CC33", rank:0})
-data.push({name:"David", votes:0, color:"#663399", rank:1})
-data.push({name:"Luca",  votes:0, color:"#993366", rank:2})
-data.push({name:"Toons", votes:0, color:"#CCFF33", rank:3})
-data.push({name:"Misha", votes:0, color:"#999900", rank:4})
+data.push({name:"Barry", votes:0, color:"#99CC33"})
+data.push({name:"David", votes:0, color:"#663399"})
+data.push({name:"Luca",  votes:0, color:"#993366"})
+data.push({name:"Toons", votes:0, color:"#CCFF33"})
+data.push({name:"Misha", votes:0, color:"#999900"})
 
 maxvotes = d3.max(data.map((d) -> d.votes))
 x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
