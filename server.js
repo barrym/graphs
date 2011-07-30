@@ -14,7 +14,7 @@ var httpServer = http.createServer(function(request, response) {
     var pathname = url.parse(request.url).pathname;
     var filename;
     if(pathname == "/") {
-        filename = "client.html";
+        filename = "public/index.html";
     } else {
         filename = path.join(process.cwd(), 'public', pathname);
     }
