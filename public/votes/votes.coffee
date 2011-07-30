@@ -2,10 +2,12 @@ w = 700
 h = 300
 p = 40
 interval = 100
+durationTime = interval
+ease = "linear"
+newpositions = []
+totalVotes = 0
 
 data = []
-ranks = []
-totalVotes = 0
 data.push({name:"Barry", votes:0, color:"#99CC33", rank:0})
 data.push({name:"David", votes:0, color:"#663399", rank:1})
 data.push({name:"Luca",  votes:0, color:"#993366", rank:2})
@@ -19,18 +21,21 @@ y = d3.scale.ordinal().domain(d3.range(data.length)).rangeBands([0, h], .2)
 setInterval(
     () ->
         data.map((d) -> d.votes += Math.round(Math.random() * Math.random() * 1000))
+
         rankeddata = data.slice(0)
         rankeddata.sort((candidate1, candidate2) -> candidate2.votes - candidate1.votes)
-        # console.log(rankeddata.map((d) ->d.name + d.votes))
+
         i = 0
+        newpositions = []
         while i < rankeddata.length
-            ranks[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes, color:rankeddata[i].color}
+            newpositions[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes, color:rankeddata[i].color}
             i++
+
         maxvotes = d3.max(data.map((d) -> d.votes))
         x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
+
         redraw()
-        data = rankeddata.slice(0)
-        # console.log(data.map((d) -> d.votes))
+
         totalVotes = d3.sum(data.map((d) -> d.votes))
         $('#leader').html(rankeddata[0].name)
         $('#votes').html(d3.format(",")(totalVotes))
@@ -78,29 +83,27 @@ vis.selectAll("text.candidates")
     .text((d) -> d.name)
 
 redraw = () ->
-    durationTime = interval
+    console.log("redraw data : #{data.map((d) -> d.name)}")
     vis.selectAll("rect")
         .data(data)
         .transition()
         .duration(durationTime)
-        .ease("linear")
+        .ease(ease)
         .attr("width", (d) -> x(d.votes))
-        .attr("y", (d) -> y(ranks[d.name].rank))
-        .style("fill", (d) -> ranks[d.name].color)
+        .attr("y", (d) -> y(newpositions[d.name].rank))
 
     vis.selectAll("text.votes")
         .data(data)
         .transition()
         .duration(durationTime)
-        .ease("linear")
+        .ease(ease)
         .attr("x", (d) -> x(d.votes))
-        .attr("y", (d) -> y(ranks[d.name].rank))
+        .attr("y", (d) -> y(newpositions[d.name].rank))
         .text((d) -> d3.format(",")(d.votes))
 
     vis.selectAll("text.candidates")
         .data(data)
         .transition()
         .duration(durationTime)
-        .ease("linear")
-        .attr("y", (d) -> y(ranks[d.name].rank))
-        .text((d) -> d.name)
+        .ease(ease)
+        .attr("y", (d) -> y(newpositions[d.name].rank))
