@@ -14,7 +14,7 @@ next = (x) ->
     }
 
 modifier = 50
-xpoints = 10
+xpoints = 60
 
 uk_o2       = d3.range(xpoints).map(next)
 uk_vodafone = d3.range(xpoints).map(next)
@@ -23,6 +23,7 @@ w = 700
 h = 300
 p = 30
 interval = 1000
+durationTime = interval/2
 
 
 uk_o2_values = uk_o2.map((d) -> d['value'])
@@ -31,6 +32,7 @@ uk_vodafone_values = uk_vodafone.map((d) -> d['value'])
 max = d3.max(uk_o2_values.concat(uk_vodafone_values))
 
 x = d3.scale.linear().domain([d3.min(uk_o2_times), d3.max(uk_o2_times)]).range([0 + p, w - p])
+gridX = d3.scale.linear().domain([0, 9]).range([0 + p, w - p])
 y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
 xTickCount = 10
@@ -52,16 +54,21 @@ $('#ytickcount_text_input').change((e) ->
 setInterval(
     () ->
         foo++
-        uk_o2.shift()
         uk_o2.push(next(foo))
-        uk_vodafone.shift()
         uk_vodafone.push(next(foo))
+        uk_o2.shift()
+        uk_vodafone.shift()
         uk_o2_values = uk_o2.map((d) -> d['value'])
         uk_o2_times = uk_o2.map((d) -> d['time'])
         uk_vodafone_values = uk_vodafone.map((d) -> d['value'])
         max = d3.max(uk_o2_values.concat(uk_vodafone_values))
+        console.log(uk_o2_times)
+        # console.log(uk_o2_times[1])
+        # console.log(uk_o2_times[10])
+
         x = d3.scale.linear().domain([d3.min(uk_o2_times), d3.max(uk_o2_times)]).range([0 + p, w - p])
-        y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
+        # x = d3.scale.linear().domain([uk_o2_times.first, uk_o2_times.last]).range([0 + p, w - p])
+        y = d3.scale.linear().domain([0, 5000]).range([h - p, 0 + p])
         redraw()
     , interval)
 
@@ -128,7 +135,6 @@ drawGraph = () ->
 
 
 redraw = () ->
-    durationTime = interval/2
 
     xrule = vis.selectAll("g.x")
         .data(x.ticks(xTickCount))
@@ -193,14 +199,14 @@ redraw = () ->
     xrule.select("text")
         .transition()
         .duration(durationTime)
-        .attr("x", x)
+        # .attr("x", x)
         .text(x.tickFormat(xTickCount))
 
-    xrule.select("line")
-        .transition()
-        .duration(durationTime)
-        .attr("x1", x)
-        .attr("x2", x)
+    # xrule.select("line")
+    #     .transition()
+    #     .duration(durationTime)
+    #     .attr("x1", x)
+    #     .attr("x2", x)
 
     yrule.select("line")
         .transition()
@@ -249,6 +255,9 @@ redraw = () ->
 
     vis.selectAll("path")
         .data([uk_o2, uk_vodafone])
-        .transition()
-        .duration(0)
+        .attr("transform", "translate(#{x(uk_o2_times[5]) - x(uk_o2_times[4])})")
         .attr("d", path)
+        .transition()
+        .ease("linear")
+        .duration(durationTime)
+        .attr("transform", "translate(0)")
