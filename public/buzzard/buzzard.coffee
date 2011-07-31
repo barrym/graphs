@@ -5,13 +5,34 @@ socket.on('connect', () ->
 )
 
 socket.on('mt_sent_update', (new_data) ->
-    # console.log "got data update"
-    # console.log(new_data)
-    # for data in new_data
-        # console.log(data.operator)
-        # console.log(data.time)
-        # console.log(data.value)
-    # redraw();
+    for data in new_data
+        if !mt_sent_data[data.operator]
+            mt_sent_data[data.operator] = d3.range(60).map((x) -> {operator:data.operator,time:x,value:1})
+
+            # Redraw, is this bad?
+            vis.selectAll("path")
+                .data(d3.values(mt_sent_data))
+                .enter()
+                .append("svg:path")
+                .attr("d", path)
+                .attr("class", (d) -> d3.first(d).operator)
+
+        mt_sent_data[data.operator].shift()
+        mt_sent_data[data.operator].push(
+            {
+                operator:data.operator,
+                time:data.time,
+                value:data.value
+            }
+        )
+
+    times.push({
+        time:d3.last(d3.first(d3.values(mt_sent_data))).time
+    })
+    times.shift()
+
+    calculate_scales()
+    redraw()
 )
 
 
@@ -19,27 +40,16 @@ socket.on('mt_sent_update', (new_data) ->
 
 
 
-foo = 0
-next = (x, operator) ->
-    foo = x
-    {
-        operator: operator,
-        time: x * 3,
-        value: Math.round(Math.random() * modifier)
-    }
-
-modifier = 500
-xpoints = 60
 mt_sent_data = []
-['uk_o2', 'uk_vodafone', 'uk_orange'].map((operator) ->
-    mt_sent_data[operator] = d3.range(xpoints).map((x) -> next(x, operator))
+# Slight hack to initialise the array
+['uk_o2'].map((operator) ->
+    mt_sent_data[operator] = d3.range(60).map((x) -> {operator:operator,time:x,value:1})
 )
 
 
 w = 700
 h = 300
 p = 30
-interval = 1000
 durationTime = 500
 x = null
 y = null
@@ -58,12 +68,7 @@ calculate_scales = () ->
     y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
 
-$('#modifier_text_input').val(modifier)
 $('#ytickcount_text_input').val(yTickCount)
-
-$('#modifier_text_input').change((e) ->
-    modifier = parseInt($('#modifier_text_input').val())
-)
 
 $('#ytickcount_text_input').change((e) ->
     yTickCount = parseInt($('#ytickcount_text_input').val())
@@ -104,32 +109,14 @@ yrule.append("svg:text")
     .attr("y", y)
     .attr("dx", -5)
 
-vis.selectAll("path.line")
+vis.selectAll("path")
     .data(d3.values(mt_sent_data))
     .enter()
     .append("svg:path")
     .attr("d", path)
     .attr("class", (d) -> d3.first(d).operator)
 
-setInterval(
-    () ->
-        foo++
-        for operator, operator_data of mt_sent_data
-            operator_data.push(next(foo, operator))
-            operator_data.shift()
-
-        times.push({
-            time:d3.last(d3.first(d3.values(mt_sent_data))).time
-        })
-        times.shift()
-
-        calculate_scales()
-
-        redraw()
-    , interval)
-
 redraw = () ->
-
     yrule = vis.selectAll("g.y")
         .data(y.ticks(yTickCount))
 

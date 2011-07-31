@@ -45,19 +45,23 @@ io          = io.listen(httpServer)
 redis       = require('redis')
 redisClient = redis.createClient()
 connected_sockets = []
-operators = ["uk_vodafone", "uk_o2", "uk_orange"]
 
 io.sockets.on('connection', (socket) ->
     console.log("client connected")
     connected_sockets.push(socket)
-    # init_data(socket)
-    socket.emit('data_update', {'channel':'mt_sent', 'message':'aaa'})
-
+    init_data()
+    # socket.emit('data_update', {'channel':'mt_sent', 'message':'aaa'})
 )
 
 setInterval(
     () ->
         now = timestamp() - 5
+        sendData(now)
+, 1000)
+
+sendData = (now) ->
+    redisClient.smembers("registered_operators", (err, operators) ->
+        operators = operators ?= []
         keys = operators.map((operator) -> "mt_sent:#{operator}:#{now}")
         redisClient.mget(keys, (err, res) ->
             message = operators.map((operator, i) ->
@@ -67,20 +71,14 @@ setInterval(
                     value    : parseInt(res[i])
                 }
             )
-            console.log(message)
 
             for socket in connected_sockets
                 socket.emit('mt_sent_update', message)
         )
-
-, 1000)
-
-
-# init_data = (socket) ->
-#     now = timestamp()
-#     for(t=(now - 60);t < now;t++) {
-#         sendValue(socket, t)
-#     }
+    )
+init_data = () ->
+    now = timestamp() - 5
+    sendData t for t in [(now - 60)..now]
 
 timestamp = () ->
     Math.round(new Date().getTime() / 1000)

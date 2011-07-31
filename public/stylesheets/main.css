@@ -85,7 +85,7 @@ line {
 
 path {
     stroke: steelblue;
-    stroke-width: 1px;
+    stroke-width: 1.5px;
     fill:none;
 }
 
@@ -98,13 +98,21 @@ text {
 }
 
 .uk_o2 {
-    stroke: blue;
+    stroke: #419EDA;
 }
 
 .uk_orange {
-    stroke: orange;
+    stroke: #ff7f00;
 }
 
 .uk_vodafone {
-    stroke: red;
+    stroke: #ff0000;
+}
+
+.uk_tmobile {
+    stroke: #E10174;
+}
+
+.uk_three {
+    stroke: #CADB2A;
 }
