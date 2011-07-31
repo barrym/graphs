@@ -1,16 +1,40 @@
+socket = io.connect('http://localhost:8888')
+
+socket.on('connect', () ->
+    console.log("connected")
+)
+
+socket.on('mt_sent_update', (new_data) ->
+    # console.log "got data update"
+    # console.log(new_data)
+    # for data in new_data
+        # console.log(data.operator)
+        # console.log(data.time)
+        # console.log(data.value)
+    # redraw();
+)
+
+
+
+
+
+
 foo = 0
-next = (x) ->
+next = (x, operator) ->
     foo = x
     {
+        operator: operator,
         time: x * 3,
         value: Math.round(Math.random() * modifier)
     }
 
 modifier = 500
 xpoints = 60
+mt_sent_data = []
+['uk_o2', 'uk_vodafone', 'uk_orange'].map((operator) ->
+    mt_sent_data.push(d3.range(xpoints).map((x) -> next(x, operator)))
+)
 
-uk_o2       = d3.range(xpoints).map(next)
-uk_vodafone = d3.range(xpoints).map(next)
 
 w = 700
 h = 300
@@ -21,17 +45,15 @@ x = null
 y = null
 yTickCount = 10
 
-times = uk_o2.map((d) ->
+times = d3.first(mt_sent_data).map((d) ->
     {
-        time: d.time,
-        visible: if d.time % 5 == 0 then true else false
+        time: d.time
     }
     )
 
 calculate_scales = () ->
-    uk_o2_values = uk_o2.map((d) -> d.value)
-    uk_vodafone_values = uk_vodafone.map((d) -> d['value'])
-    max = d3.max(uk_o2_values.concat(uk_vodafone_values))
+    values = d3.merge(mt_sent_data.map((data_objects) -> data_objects.map((d) -> d.value)))
+    max = d3.max(values)
     x = d3.scale.linear().domain([d3.min(times.map((d) -> d.time)), d3.max(times.map((d) -> d.time))]).range([0 + 2 * p, w - p])
     y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
@@ -83,30 +105,29 @@ yrule.append("svg:text")
     .attr("dx", -5)
 
 vis.selectAll("path.line")
-    .data([uk_o2, uk_vodafone])
+    .data(mt_sent_data)
     .enter()
     .append("svg:path")
     .attr("d", path)
-    .attr("class", (d, i) -> ( if i == 0 then "uk_o2" else "uk_vodafone"))
-
+    .attr("class", (d) -> d3.first(d).operator)
 
 setInterval(
     () ->
         foo++
-        uk_o2.push(next(foo))
-        uk_vodafone.push(next(foo))
-        uk_o2.shift()
-        uk_vodafone.shift()
+        mt_sent_data.map((operator_data) ->
+            operator = d3.first(operator_data).operator
+            operator_data.push(next(foo, operator))
+            operator_data.shift()
+        )
         times.push({
-            time:d3.last(uk_o2).time,
-            visible: if d3.last(uk_o2).time % 5 == 0 then true else false
+            time:d3.last(d3.first(mt_sent_data)).time
         })
         times.shift()
+
         calculate_scales()
 
         redraw()
     , interval)
-
 
 redraw = () ->
 
@@ -175,7 +196,7 @@ redraw = () ->
     oldyrule.transition().duration(durationTime).remove()
 
     vis.selectAll("path")
-        .data([uk_o2, uk_vodafone])
+        .data(mt_sent_data)
         .attr("transform", "translate(#{x(times[5].time) - x(times[4].time)})")
         .attr("d", path)
         .transition()

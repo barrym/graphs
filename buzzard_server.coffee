@@ -45,7 +45,7 @@ io          = io.listen(httpServer)
 redis       = require('redis')
 redisClient = redis.createClient()
 connected_sockets = []
-operators = ["uk_vodafone", "uk_o2"]
+operators = ["uk_vodafone", "uk_o2", "uk_orange"]
 
 io.sockets.on('connection', (socket) ->
     console.log("client connected")
