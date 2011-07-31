@@ -36,10 +36,10 @@ div#chart {
     color: #00aa00;
 }
 
-#chart rect {
-    stroke: black;
-    fill: steelblue;
-}
+/* #chart rect { */
+/*     stroke: black; */
+/*     fill: steelblue; */
+/* } */
 
 .large {
     font-weight:bold;
@@ -97,22 +97,42 @@ text {
     color: red;
 }
 
-.uk_o2 {
+path.uk_o2 {
     stroke: #419EDA;
 }
 
-.uk_orange {
+path.uk_orange {
     stroke: #ff7f00;
 }
 
-.uk_vodafone {
+path.uk_vodafone {
     stroke: #ff0000;
 }
 
-.uk_tmobile {
+path.uk_tmobile {
     stroke: #E10174;
 }
 
-.uk_three {
+path.uk_three {
     stroke: #CADB2A;
+}
+
+rect.uk_o2 {
+    fill: #419EDA;
+}
+
+rect.uk_orange {
+    fill: #ff7f00;
+}
+
+rect.uk_vodafone {
+    fill: #ff0000;
+}
+
+rect.uk_tmobile {
+    fill: #E10174;
+}
+
+rect.uk_three {
+    fill: #CADB2A;
 }

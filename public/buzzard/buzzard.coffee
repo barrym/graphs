@@ -9,13 +9,35 @@ socket.on('mt_sent_update', (new_data) ->
         if !mt_sent_data[data.operator]
             mt_sent_data[data.operator] = d3.range(60).map((x) -> {operator:data.operator,time:x,value:1})
 
-            # Redraw, is this bad?
+            # Redraw, is this bad? Move to redraw() ?
             vis.selectAll("path")
                 .data(d3.values(mt_sent_data))
                 .enter()
                 .append("svg:path")
                 .attr("d", path)
                 .attr("class", (d) -> d3.first(d).operator)
+
+            vis.selectAll("rect.legend")
+                .data(d3.keys(mt_sent_data))
+                .enter()
+                .append("svg:rect")
+                .attr("x", w + 10)
+                .attr("y", (d, i) -> (i * 30))
+                .attr("height", 15)
+                .attr("width", 15)
+                .attr("class", (d) -> "legend #{d}")
+
+            vis.selectAll("text.legend")
+                .data(d3.keys(mt_sent_data))
+                .enter()
+                .append("svg:text")
+                .attr("x", w + 10)
+                .attr("y", (d, i) -> (i * 30))
+                .attr("class", "legend")
+                .attr("dx", 20)
+                .attr("dy", 12)
+                .text(String)
+
 
         mt_sent_data[data.operator].shift()
         mt_sent_data[data.operator].push(
@@ -47,7 +69,7 @@ mt_sent_data = []
 )
 
 
-w = 700
+w = 500
 h = 300
 p = 30
 durationTime = 500
@@ -79,7 +101,7 @@ calculate_scales()
 
 vis = d3.select("#chart")
     .append("svg:svg")
-    .attr("width", w + p * 2)
+    .attr("width", w + p * 6) # To make room for the labels
     .attr("height", h + p * 2)
     .append("svg:g")
     .attr("transform", "translate(#{p}, #{p})")
