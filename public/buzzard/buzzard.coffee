@@ -30,7 +30,7 @@ uk_vodafone_values = uk_vodafone.map((d) -> d.value)
 max = d3.max(uk_o2_values.concat(uk_vodafone_values))
 
 x = d3.scale.linear().domain([d3.min(times.map((d) -> d.time)), d3.max(times.map((d) -> d.time))]).range([0 + p, w - p])
-y = d3.scale.linear().domain([0, 5000]).range([h - p, 0 + p])
+y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
 xTickCount = 10
 yTickCount = 10
@@ -133,7 +133,7 @@ setInterval(
 
         x = d3.scale.linear().domain([d3.min(times.map((d) -> d.time)), d3.max(times.map((d) -> d.time))]).range([0 + p, w - p])
         # x = d3.scale.linear().domain([times.first, times.last]).range([0 + p, w - p])
-        y = d3.scale.linear().domain([0, 5000]).range([h - p, 0 + p])
+        y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
         redraw()
     , interval)
 
@@ -157,6 +157,7 @@ redraw = () ->
         .attr("y2", 0)
         .transition()
         .duration(durationTime)
+        .ease("bounce")
         .attr("y1", y)
         .attr("y2", y)
 
@@ -165,6 +166,7 @@ redraw = () ->
         .attr("y", 0)
         .transition()
         .duration(durationTime)
+        .ease("bounce")
         .attr("y", y)
         .text(y.tickFormat(yTickCount))
 
@@ -243,6 +245,7 @@ redraw = () ->
     oldyrule.select("line")
             .transition()
             .duration(durationTime)
+            .ease("back")
             .attr("y1", 0)
             .attr("y2", 0)
             .style("opacity", 0)
@@ -251,6 +254,7 @@ redraw = () ->
     oldyrule.select("text")
             .transition()
             .duration(durationTime)
+            .ease("back")
             .attr("y", 0)
             .style("opacity", 0)
             .remove()
