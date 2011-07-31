@@ -51,6 +51,7 @@ var redisClient = redis.createClient();
 io.sockets.on('connection', function(socket) {
     console.log("client connected");
     init_data(socket);
+
     setInterval(function() {
         now = timestamp() - 5;
         sendValue(socket, now);
