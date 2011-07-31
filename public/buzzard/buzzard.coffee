@@ -32,7 +32,7 @@ modifier = 500
 xpoints = 60
 mt_sent_data = []
 ['uk_o2', 'uk_vodafone', 'uk_orange'].map((operator) ->
-    mt_sent_data.push(d3.range(xpoints).map((x) -> next(x, operator)))
+    mt_sent_data[operator] = d3.range(xpoints).map((x) -> next(x, operator))
 )
 
 
@@ -45,14 +45,14 @@ x = null
 y = null
 yTickCount = 10
 
-times = d3.first(mt_sent_data).map((d) ->
+times = d3.first(d3.values(mt_sent_data)).map((d) ->
     {
         time: d.time
     }
     )
 
 calculate_scales = () ->
-    values = d3.merge(mt_sent_data.map((data_objects) -> data_objects.map((d) -> d.value)))
+    values = d3.merge(d3.values(mt_sent_data).map((data_objects) -> data_objects.map((d) -> d.value)))
     max = d3.max(values)
     x = d3.scale.linear().domain([d3.min(times.map((d) -> d.time)), d3.max(times.map((d) -> d.time))]).range([0 + 2 * p, w - p])
     y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
@@ -105,7 +105,7 @@ yrule.append("svg:text")
     .attr("dx", -5)
 
 vis.selectAll("path.line")
-    .data(mt_sent_data)
+    .data(d3.values(mt_sent_data))
     .enter()
     .append("svg:path")
     .attr("d", path)
@@ -114,13 +114,12 @@ vis.selectAll("path.line")
 setInterval(
     () ->
         foo++
-        mt_sent_data.map((operator_data) ->
-            operator = d3.first(operator_data).operator
+        for operator, operator_data of mt_sent_data
             operator_data.push(next(foo, operator))
             operator_data.shift()
-        )
+
         times.push({
-            time:d3.last(d3.first(mt_sent_data)).time
+            time:d3.last(d3.first(d3.values(mt_sent_data))).time
         })
         times.shift()
 
@@ -196,7 +195,7 @@ redraw = () ->
     oldyrule.transition().duration(durationTime).remove()
 
     vis.selectAll("path")
-        .data(mt_sent_data)
+        .data(d3.values(mt_sent_data))
         .attr("transform", "translate(#{x(times[5].time) - x(times[4].time)})")
         .attr("d", path)
         .transition()
