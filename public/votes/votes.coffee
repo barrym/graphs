@@ -83,7 +83,6 @@ vis.selectAll("text.candidates")
     .text((d) -> d.name)
 
 redraw = () ->
-    console.log("redraw data : #{data.map((d) -> d.name)}")
     vis.selectAll("rect")
         .data(data)
         .transition()
