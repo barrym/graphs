@@ -48,19 +48,12 @@ socket.on('mt_sent_update', (new_data) ->
             }
         )
 
-    times.push({
-        time:d3.last(d3.first(d3.values(mt_sent_data))).time
-    })
+    times.push(d3.last(d3.first(d3.values(mt_sent_data))).time )
     times.shift()
 
     calculate_scales()
     redraw()
 )
-
-
-
-
-
 
 mt_sent_data = []
 # Slight hack to initialise the array
@@ -77,16 +70,12 @@ x = null
 y = null
 yTickCount = 10
 
-times = d3.first(d3.values(mt_sent_data)).map((d) ->
-    {
-        time: d.time
-    }
-    )
+times = d3.first(d3.values(mt_sent_data)).map((d) -> d.time)
 
 calculate_scales = () ->
     values = d3.merge(d3.values(mt_sent_data).map((data_objects) -> data_objects.map((d) -> d.value)))
     max = d3.max(values)
-    x = d3.scale.linear().domain([d3.min(times.map((d) -> d.time)), d3.max(times.map((d) -> d.time))]).range([0 + 2 * p, w - p])
+    x = d3.scale.linear().domain([d3.min(times), d3.max(times)]).range([0 + 2 * p, w - p])
     y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
 
@@ -205,7 +194,7 @@ redraw = () ->
 
     vis.selectAll("path")
         .data(d3.values(mt_sent_data))
-        .attr("transform", "translate(#{x(times[5].time) - x(times[4].time)})")
+        .attr("transform", "translate(#{x(times[5]) - x(times[4])})")
         .attr("d", path)
         .transition()
         .ease("linear")
