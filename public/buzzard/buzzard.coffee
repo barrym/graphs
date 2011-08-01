@@ -1,3 +1,24 @@
+count = 0
+xrule_data = []
+xrulePeriod = 10
+
+mt_sent_data = []
+# Slight hack to initialise the array
+['uk_o2'].map((operator) ->
+    mt_sent_data[operator] = d3.range(60).map((x) -> {operator:operator,time:x,value:1})
+)
+
+
+w = 500
+h = 300
+p = 30
+durationTime = 500
+x = null
+y = null
+yTickCount = 10
+
+times = d3.first(d3.values(mt_sent_data)).map((d) -> d.time)
+
 socket = io.connect('http://localhost:8888')
 
 socket.on('connect', () ->
@@ -48,29 +69,23 @@ socket.on('mt_sent_update', (new_data) ->
             }
         )
 
-    times.push(d3.last(d3.first(d3.values(mt_sent_data))).time )
+    latest_timestamp = d3.last(d3.first(d3.values(mt_sent_data))).time
+    times.push(latest_timestamp)
     times.shift()
+
+    count++
+    if count == xrulePeriod
+        console.log("displaying this date #{latest_timestamp}")
+        xrule_data.push({time:latest_timestamp})
+        if xrule_data.length == (60/xrulePeriod) + 1 # On first load it might not have 3 elements
+            console.log("removing")
+            xrule_data.shift()
+        count = 0
+
 
     calculate_scales()
     redraw()
 )
-
-mt_sent_data = []
-# Slight hack to initialise the array
-['uk_o2'].map((operator) ->
-    mt_sent_data[operator] = d3.range(60).map((x) -> {operator:operator,time:x,value:1})
-)
-
-
-w = 500
-h = 300
-p = 30
-durationTime = 500
-x = null
-y = null
-yTickCount = 10
-
-times = d3.first(d3.values(mt_sent_data)).map((d) -> d.time)
 
 calculate_scales = () ->
     values = d3.merge(d3.values(mt_sent_data).map((data_objects) -> data_objects.map((d) -> d.value)))
@@ -78,6 +93,10 @@ calculate_scales = () ->
     x = d3.scale.linear().domain([d3.min(times), d3.max(times)]).range([0 + 2 * p, w - p])
     y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
+dateFormatter = d3.time.format("%H:%M:%S")
+formatDate = (timestamp) ->
+    date = new Date(timestamp * 1000)
+    dateFormatter(date)
 
 $('#ytickcount_text_input').val(yTickCount)
 
@@ -127,9 +146,34 @@ vis.selectAll("path")
     .attr("d", path)
     .attr("class", (d) -> d3.first(d).operator)
 
+xrule = vis.selectAll("g.x")
+    .data(xrule_data, (d) -> d.time)
+    .enter()
+    .append("svg:g")
+    .attr("class", "x")
+
+xrule.append("svg:line")
+    .style("shape-rendering", "crispEdges")
+    .attr("x1", (d) -> x(d.time))
+    .attr("y1", h)
+    .attr("x2", (d) -> x(d.time))
+    .attr("y2", h-10)
+
+xrule.append("svg:text")
+    .attr("x", (d) -> x(d.time))
+    .attr("y", h)
+    .text(String)
+
+
 redraw = () ->
+
     yrule = vis.selectAll("g.y")
         .data(y.ticks(yTickCount))
+
+
+    xrule = vis.selectAll("g.x")
+        .data(xrule_data, (d) -> d.time)
+
 
     # NEW
     newyrule = yrule.enter().append("svg:g")
@@ -157,6 +201,32 @@ redraw = () ->
         .attr("dx", -5)
         .text(y.tickFormat(yTickCount))
 
+    newxrule = xrule.enter().append("svg:g")
+        .attr("class", "x")
+
+    newxrule.append("svg:line")
+        .style("shape-rendering", "crispEdges")
+        .attr("x1", w + p)
+        .attr("y1", h)
+        .attr("x2", w + p)
+        .attr("y2", 0)
+        .transition()
+        .duration(durationTime)
+        .ease("bounce")
+        .attr("x1", (d) -> x(d.time))
+        .attr("x2", (d) -> x(d.time))
+
+    newxrule.append("svg:text")
+        .text((d) -> formatDate(d.time))
+        .style("font-size", "12")
+        .attr("text-anchor", "middle")
+        .attr("x", w + p)
+        .attr("y", h)
+        .transition()
+        .duration(durationTime)
+        .ease("bounce")
+        .attr("x", (d) -> x(d.time))
+
     # UPDATES
     yrule.select("text")
         .transition()
@@ -169,6 +239,21 @@ redraw = () ->
         .duration(durationTime)
         .attr("y1", y)
         .attr("y2", y)
+
+    xrule.select("line")
+        .transition()
+        .duration(durationTime)
+        .ease("linear")
+        .attr("x1", (d) -> x(d.time))
+        .attr("x2", (d) -> x(d.time))
+
+    xrule.select("text")
+        .transition()
+        .duration(durationTime)
+        .ease("linear")
+        .attr("x", (d) -> x(d.time))
+        # .attr("y", h)
+        # .text(String)
 
     # OLD
     oldyrule = yrule.exit()
@@ -191,6 +276,27 @@ redraw = () ->
             .remove()
 
     oldyrule.transition().duration(durationTime).remove()
+
+    oldxrule = xrule.exit()
+
+    oldxrule.select("line")
+            .transition()
+            .duration(durationTime)
+            # .ease("back")
+            # .attr("x1", 0 - p)
+            # .attr("x2", 0 - p)
+            .style("opacity", 0)
+            .remove()
+
+    oldxrule.select("text")
+            .transition()
+            .duration(durationTime)
+            # .ease("linear")
+            # .attr("x", 0 - p)
+            .style("opacity", 0)
+            .remove()
+
+    oldxrule.transition().duration(durationTime).remove()
 
     vis.selectAll("path")
         .data(d3.values(mt_sent_data))
