@@ -8,6 +8,14 @@ mt_sent_data = []
     mt_sent_data[operator] = d3.range(60).map((x) -> {operator:operator,time:x,value:1})
 )
 
+operatorName = {
+    'uk_o2':'O2',
+    'uk_vodafone':'Vodafone',
+    'uk_three':'Three',
+    'uk_tmobile':'T-Mobile',
+    'uk_orange':'Orange'
+    }
+
 
 w = 500
 h = 300
@@ -15,7 +23,7 @@ p = 30
 durationTime = 500
 x = null
 y = null
-yTickCount = 10
+yTickCount = 5
 
 times = d3.first(d3.values(mt_sent_data)).map((d) -> d.time)
 
@@ -56,8 +64,8 @@ socket.on('mt_sent_update', (new_data) ->
                 .attr("y", (d, i) -> (i * 30))
                 .attr("class", "legend")
                 .attr("dx", 20)
-                .attr("dy", 12)
-                .text(String)
+                .attr("dy", 14)
+                .text((node_name) -> operatorName[node_name])
 
 
         mt_sent_data[data.operator].shift()
@@ -207,7 +215,7 @@ redraw = () ->
     newxrule.append("svg:line")
         .style("shape-rendering", "crispEdges")
         .attr("x1", w + p)
-        .attr("y1", h)
+        .attr("y1", h - p)
         .attr("x2", w + p)
         .attr("y2", 0)
         .transition()
@@ -218,10 +226,11 @@ redraw = () ->
 
     newxrule.append("svg:text")
         .text((d) -> formatDate(d.time))
-        .style("font-size", "12")
+        .style("font-size", "14")
         .attr("text-anchor", "middle")
         .attr("x", w + p)
-        .attr("y", h)
+        .attr("y", h - p)
+        .attr("dy", 15)
         .transition()
         .duration(durationTime)
         .ease("bounce")

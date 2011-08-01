@@ -1,18 +1,20 @@
 
 <!DOCTYPE html>
 <html>
-  <body>
-    <div id="chart">
-    </div>
-    <label>yTickCount</label><input type=text id="ytickcount_text_input"/>
-  </body>
-  <head>
-    <title>Buzzard</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js""></script>
-    <script type="text/javascript" src="/d3/d3.js"></script>
-    <script type="text/javascript" src="/d3/d3.time.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="/buzzard/buzzard.js"></script>
-    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
-  </head>
+    <body>
+        <div>MTs Sent Per Second</div>
+        <div id="chart">
+        </div>
+        <br/>
+        <label>yTickCount</label><input type=text id="ytickcount_text_input"/>
+    </body>
+    <head>
+        <title>Buzzard</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js""></script>
+        <script type="text/javascript" src="/d3/d3.js"></script>
+        <script type="text/javascript" src="/d3/d3.time.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/buzzard/buzzard.js"></script>
+        <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
+    </head>
 </html>
