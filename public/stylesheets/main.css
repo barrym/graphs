@@ -1,7 +1,7 @@
 body {
-    font-family:"Helvetica";
-    background-color: #000;
-    color: #fff;
+   font-family:"Helvetica";
+    background-color: #fff;
+    color: #000;
 }
 
 div {
@@ -58,8 +58,8 @@ svg {
 
 text {
     font-family: Helvetica;
-    fill: #fff;
-    stroke: #fff;
+    fill: black;
+    stroke: black;
     stroke-width:0px;
 }
 

@@ -62,7 +62,9 @@ setInterval(
 sendData = (now) ->
     redisClient.smembers("registered_operators", (err, operators) ->
         operators = operators ?= []
+
         keys = operators.map((operator) -> "mt_sent:#{operator}:#{now}")
+
         redisClient.mget(keys, (err, res) ->
             message = operators.map((operator, i) ->
                 {
