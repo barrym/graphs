@@ -1,4 +1,5 @@
 count = 0
+high_point = null
 xrule_data = []
 xrulePeriod = 10 # seconds
 
@@ -93,8 +94,9 @@ socket.on('mt_sent_update', (new_data) ->
 )
 
 calculate_scales = () ->
-    values = d3.merge(d3.values(mt_sent_data).map((data_objects) -> data_objects.map((d) -> d.value)))
-    max = d3.max(values)
+    all_data_objects = d3.merge(d3.values(mt_sent_data))
+    max = d3.max(all_data_objects, (d) -> d.value)
+    high_point = d3.first(all_data_objects.filter((e, i, a) -> e.value == max))
     x = d3.scale.linear().domain([d3.min(times), d3.max(times)]).range([0 + 2 * p, w - p])
     y = d3.scale.linear().domain([0, max]).range([h - p, 0 + p])
 
@@ -144,13 +146,6 @@ yrule.append("svg:text")
     .attr("y", y)
     .attr("dx", -5)
 
-vis.selectAll("path")
-    .data(d3.values(mt_sent_data))
-    .enter()
-    .append("svg:path")
-    .attr("d", path)
-    .attr("class", (d) -> d3.first(d).operator)
-
 xrule = vis.selectAll("g.x")
     .data(xrule_data, (d) -> d.time)
     .enter()
@@ -168,6 +163,32 @@ xrule.append("svg:text")
     .attr("x", (d) -> x(d.time))
     .attr("y", h)
     .text(String)
+
+high = vis.selectAll("g.high_point")
+    .data([high_point])
+    .enter()
+    .append("svg:g")
+    .attr("class","high_point")
+
+high.append("svg:circle")
+    .attr("cx", (d) -> x(d.time))
+    .attr("cy", (d) -> y(d.value))
+    .attr("class", (d) -> d.operator)
+    .attr("r", 4)
+
+high.append("svg:text")
+    .attr("x", (d) -> x(d.time))
+    .attr("y", (d) -> y(d.value))
+    .attr("text-anchor", "middle")
+    .attr("dy", -10)
+    .text((d) -> d.value)
+
+vis.selectAll("path")
+    .data(d3.values(mt_sent_data))
+    .enter()
+    .append("svg:path")
+    .attr("d", path)
+    .attr("class", (d) -> d3.first(d).operator)
 
 
 redraw = () ->
@@ -293,6 +314,7 @@ redraw = () ->
             .style("opacity", 0)
             .remove()
 
+    # UPDATE PATH
     vis.selectAll("path")
         .data(d3.values(mt_sent_data))
         .attr("transform", "translate(#{x(times[5]) - x(times[4])})")
@@ -301,3 +323,24 @@ redraw = () ->
         .ease("linear")
         .duration(durationTime)
         .attr("transform", "translate(0)")
+
+    # UPDATE HIGH POINT
+
+    high = vis.selectAll("g.high_point")
+        .data([high_point])
+
+    high.select("circle")
+        .transition()
+        .duration(durationTime)
+        .ease("linear")
+        .attr("cx", (d) -> console.log(d);x(d.time))
+        .attr("cy", (d) -> y(d.value))
+
+    high.select("text")
+        .transition()
+        .duration(durationTime)
+        .ease("linear")
+        .attr("x", (d) -> x(d.time))
+        .attr("y", (d) -> y(d.value))
+        .text((d) -> d.value)
+        .attr("class", (d) -> d.operator)

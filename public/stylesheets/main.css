@@ -117,22 +117,22 @@ path.uk_three {
     stroke: #CADB2A;
 }
 
-rect.uk_o2 {
+circle.uk_o2, rect.uk_o2 {
     fill: #419EDA;
 }
 
-rect.uk_orange {
+circle.uk_orange, rect.uk_orange {
     fill: #ff7f00;
 }
 
-rect.uk_vodafone {
+circle.uk_vodafone, rect.uk_vodafone {
     fill: #ff0000;
 }
 
-rect.uk_tmobile {
+circle.uk_tmobile, rect.uk_tmobile {
     fill: #E10174;
 }
 
-rect.uk_three {
+circle.uk_three, rect.uk_three {
     fill: #CADB2A;
 }
