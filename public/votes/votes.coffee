@@ -18,28 +18,60 @@ maxvotes = d3.max(data.map((d) -> d.votes))
 x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
 y = d3.scale.ordinal().domain(d3.range(data.length)).rangeBands([0, h], .2)
 
-setInterval(
-    () ->
-        data.map((d) -> d.votes += Math.round(Math.random() * Math.random() * 1000))
 
-        rankeddata = data.slice(0)
-        rankeddata.sort((candidate1, candidate2) -> candidate2.votes - candidate1.votes)
+socket = io.connect('http://localhost:8888')
 
-        i = 0
-        newpositions = []
-        while i < rankeddata.length
-            newpositions[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes, color:rankeddata[i].color}
-            i++
+socket.on('connect', () ->
+    console.log("connected")
+)
 
-        maxvotes = d3.max(data.map((d) -> d.votes))
-        x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
+socket.on('votes', (new_data) ->
+    parsed_data = JSON.parse(new_data)
+    data.forEach((e, i, a) ->
+        if e.name == parsed_data.name
+            e.votes += parsed_data.votes
+    )
+    rankeddata = data.slice(0)
+    rankeddata.sort((candidate1, candidate2) -> candidate2.votes - candidate1.votes)
 
-        redraw()
+    i = 0
+    newpositions = []
+    while i < rankeddata.length
+        newpositions[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes, color:rankeddata[i].color}
+        i++
 
-        totalVotes = d3.sum(data.map((d) -> d.votes))
-        $('#leader').html(rankeddata[0].name)
-        $('#votes').html(d3.format(",")(totalVotes))
-    , interval)
+    maxvotes = d3.max(data.map((d) -> d.votes))
+    x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
+
+    redraw()
+
+    totalVotes = d3.sum(data.map((d) -> d.votes))
+    $('#leader').html(rankeddata[0].name)
+    $('#votes').html(d3.format(",")(totalVotes))
+)
+
+# setInterval(
+#     () ->
+#         data.map((d) -> d.votes += Math.round(Math.random() * Math.random() * 1000))
+#
+#         rankeddata = data.slice(0)
+#         rankeddata.sort((candidate1, candidate2) -> candidate2.votes - candidate1.votes)
+#
+#         i = 0
+#         newpositions = []
+#         while i < rankeddata.length
+#             newpositions[rankeddata[i].name] = {rank:i, votes:rankeddata[i].votes, color:rankeddata[i].color}
+#             i++
+#
+#         maxvotes = d3.max(data.map((d) -> d.votes))
+#         x = d3.scale.linear().domain([0, maxvotes]).range([p, w - p * 2]) # WHY?!
+#
+#         redraw()
+#
+#         totalVotes = d3.sum(data.map((d) -> d.votes))
+#         $('#leader').html(rankeddata[0].name)
+#         $('#votes').html(d3.format(",")(totalVotes))
+#     , interval)
 
 vis = d3.select("#chart")
     .append("svg:svg")
@@ -92,13 +124,13 @@ redraw = () ->
         .attr("y", (d) -> y(newpositions[d.name].rank))
 
     vis.selectAll("text.votes")
+        .text((d) -> d3.format(",")(d.votes))
         .data(data)
         .transition()
         .duration(durationTime)
         .ease(ease)
         .attr("x", (d) -> x(d.votes))
         .attr("y", (d) -> y(newpositions[d.name].rank))
-        .text((d) -> d3.format(",")(d.votes))
 
     vis.selectAll("text.candidates")
         .data(data)

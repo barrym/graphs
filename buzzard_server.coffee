@@ -41,9 +41,10 @@ httpServer = http.createServer((request, response) ->
 httpServer.listen('8888')
 
 # SOCKET.IO DATA PUSHES
-io          = io.listen(httpServer)
-redis       = require('redis')
-redisClient = redis.createClient()
+io           = io.listen(httpServer)
+redis        = require('redis')
+redisClient  = redis.createClient()
+pubsubClient = redis.createClient()
 connected_sockets = []
 
 io.sockets.on('connection', (socket) ->
@@ -58,6 +59,14 @@ setInterval(
         now = timestamp() - 5
         sendData(now)
 , 1000)
+
+
+pubsubClient.on("message", (channel, message) ->
+    for socket in connected_sockets
+        socket.emit(channel, message)
+)
+
+pubsubClient.subscribe("votes")
 
 sendData = (now) ->
     redisClient.smembers("registered_operators", (err, operators) ->
@@ -78,6 +87,7 @@ sendData = (now) ->
                 socket.emit('mt_sent_update', message)
         )
     )
+
 init_data = () ->
     now = timestamp() - 5
     sendData t for t in [(now - 60)..now]
