@@ -4,6 +4,11 @@ body {
     color: #000;
 }
 
+a {
+    text-decoration: none;
+    color: steelblue;
+}
+
 div {
     float: left;
     clear:both;
@@ -74,7 +79,7 @@ text.votes {
     fill: black;
     stroke: black;
     font-size:30px;
-    stroke-width:1px;
+    /* stroke-width:1px; */
 }
 
 .chart {
