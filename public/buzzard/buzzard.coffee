@@ -1,6 +1,6 @@
 count = 0
 xrule_data = []
-xrulePeriod = 10
+xrulePeriod = 10 # seconds
 
 mt_sent_data = []
 # Slight hack to initialise the array
@@ -83,13 +83,10 @@ socket.on('mt_sent_update', (new_data) ->
 
     count++
     if count == xrulePeriod
-        console.log("displaying this date #{latest_timestamp}")
         xrule_data.push({time:latest_timestamp})
         if xrule_data.length == (60/xrulePeriod) + 1 # On first load it might not have 3 elements
-            console.log("removing")
             xrule_data.shift()
         count = 0
-
 
     calculate_scales()
     redraw()
@@ -261,8 +258,6 @@ redraw = () ->
         .duration(durationTime)
         .ease("linear")
         .attr("x", (d) -> x(d.time))
-        # .attr("y", h)
-        # .text(String)
 
     # OLD
     oldyrule = yrule.exit()
@@ -284,28 +279,19 @@ redraw = () ->
             .style("opacity", 0)
             .remove()
 
-    oldyrule.transition().duration(durationTime).remove()
-
     oldxrule = xrule.exit()
 
     oldxrule.select("line")
             .transition()
             .duration(durationTime)
-            # .ease("back")
-            # .attr("x1", 0 - p)
-            # .attr("x2", 0 - p)
             .style("opacity", 0)
             .remove()
 
     oldxrule.select("text")
             .transition()
             .duration(durationTime)
-            # .ease("linear")
-            # .attr("x", 0 - p)
             .style("opacity", 0)
             .remove()
-
-    oldxrule.transition().duration(durationTime).remove()
 
     vis.selectAll("path")
         .data(d3.values(mt_sent_data))
