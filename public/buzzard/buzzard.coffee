@@ -24,7 +24,7 @@ p = 30
 durationTime = 500
 x = null
 y = null
-yTickCount = 5
+yTickCount = 8
 
 times = d3.first(d3.values(mt_sent_data)).map((d) -> d.time)
 
@@ -305,12 +305,16 @@ redraw = () ->
     oldxrule.select("line")
             .transition()
             .duration(durationTime)
+            .ease("linear")
+            .delay(durationTime * 0.8)
             .style("opacity", 0)
             .remove()
 
     oldxrule.select("text")
             .transition()
-            .duration(durationTime)
+            .duration(durationTime * 0.8)
+            .ease("linear")
+            .delay(durationTime)
             .style("opacity", 0)
             .remove()
 
