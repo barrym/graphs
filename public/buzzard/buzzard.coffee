@@ -196,15 +196,15 @@ redraw = () ->
         .attr("y2", y)
 
     newyrule.append("svg:text")
+        .text(y.tickFormat(yTickCount))
         .attr("text-anchor", "end")
+        .attr("dx", -5)
         .attr("x", p)
         .attr("y", 0)
         .transition()
         .duration(durationTime)
         .ease("bounce")
         .attr("y", y)
-        .attr("dx", -5)
-        .text(y.tickFormat(yTickCount))
 
     newxrule = xrule.enter().append("svg:g")
         .attr("class", "x")
